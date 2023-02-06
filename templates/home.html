@@ -2,4 +2,11 @@
 
 {% block title %} Home Page{% endblock%}
 
-{% block content %} this is the home page{% endblock%}
+{% block content %}
+
+    <form action='/' method='POST'>
+    Email: <input type='text' name='email'><br>
+    Password: <input type='text' name='password'><br>
+    <input type='submit'><br>
+    </form>
+{% endblock%}

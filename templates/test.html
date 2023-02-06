@@ -1,0 +1,30 @@
+{% extends "bootstrap/blank.html" %}
+
+{% block title %} The Test {% endblock%}
+
+{% block content %}
+
+    <p>This is the Test</p>
+    <div class='container'>
+        <h3>Test</h3>
+            <form>
+                <a href=# id=test><button class='btn btn-primary btn-user btn-block'>Test</button></a>
+            </form>
+
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type=text/javascript>
+            $(function() {
+              $('a#test').on('click', function(e) {
+                e.preventDefault()
+                $.getJSON('/addToPastTests',
+                    function(data) {
+                  //do nothing
+                });
+                return false;
+              });
+            });
+    </script>
+
+{% endblock%}
