@@ -9,6 +9,7 @@ from wtforms import FileField, SubmitField
 from werkzeug.utils import secure_filename
 import os
 from wtforms.validators import InputRequired
+import firebaseStorage
 
 app = Flask(__name__)
 
@@ -63,17 +64,22 @@ class UploadFileForm(FlaskForm):
 
 @app.route('/')
 def home():
-    if session:
+    if 'user' in session:
         app.logger.info(session)
-
+        email = session['user']
+        password = session['password']
+        auth.sign_in_with_email_and_password(email, password)
     return render_template("test.html")
 
 
-@app.route('/addToPastTests')
+@app.route('/addToPastTests', methods=["POST", "GET"])
 def addToPastTests():
-    if session:
+    if 'user' in session:
         userInfo = db.collection('users').document(session['user'])
         userInfo.update({'pasttests': firestore.ArrayUnion([str(datetime.now())])})
+        #firebaseStorage.pushFile('static/files/mountains.png')
+        return 'Hello'
+
 
 
 @app.route('/takethetest', methods=["POST", "GET"])
@@ -83,7 +89,24 @@ def test():
         file = form.file.data  # First grab the file
         file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
                                secure_filename(file.filename)))  # Then save the file
-        return "File has been uploaded to static/files folder"
+
+        app.logger.info("file saved")
+
+        #os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
+                               #secure_filename(file.filename)))
+
+        # try:
+        #     firebaseStorage.pushFile(file.filename)
+        # except:
+        #     app.logger.info('problem')
+
+
+
+        # os.remove('/static/files/'+file.filename)
+
+
+        return "File has been uploaded to static/files folder and to the database"
+
     return render_template('index.html', form=form)
     # return render_template("test.html")
 

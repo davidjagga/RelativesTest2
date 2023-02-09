@@ -19,6 +19,7 @@ def login():
             user = auth.sign_in_with_email_and_password(email, password)
             app.logger.info('2')
             session['user'] = email
+            session['password'] = password
             app.logger.info('Logged In')
             return redirect('/')
 
@@ -45,6 +46,7 @@ def register():
             user = auth.create_user_with_email_and_password(email, password)
             app.logger.info("Made account")
             session['user'] = email
+            session['password'] = password
             app.logger.info("Put account in session")
 
             userInfo = db.collection('users').document(email)
