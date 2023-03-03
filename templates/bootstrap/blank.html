@@ -194,6 +194,9 @@
         </div>
     </div>
 
+    {% block scripts %}
+    {% endblock%}
+
     <!-- Bootstrap core JavaScript-->
     <script src="{{url_for('static', filename='vendor/jquery/jquery.min.js')}}"></script>
     <script src="{{url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
@@ -203,6 +206,8 @@
 
     <!-- Custom scripts for all pages-->
     <script src="{{url_for('static', filename='js/sb-admin-2.min.js')}}"></script>
+
+
 
 </body>
 

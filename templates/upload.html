@@ -1,0 +1,57 @@
+{% extends "bootstrap/blank.html" %}
+
+{% block title %} Upload Test Image {% endblock%}
+
+{% block content %}
+
+
+
+
+    <form method='POST' enctype='multipart/form-data'>
+        <h1>Upload A Photo of Yourself</h1>
+        {{form.hidden_tag()}}
+        {{form.file(**{"id":"filefield"})}}
+        <div></div>
+        <h1>Upload A Photo of a Relative</h1>
+        {{ form.relativeFile(**{"id":"relativeField"})}}
+
+        <div>
+			<img style="height:100px;width:100px;display:none" id="your-image"/>
+		</div>
+
+        <img id="mainImg" src="#" alt="" />
+        <img id="relativeImg" src="#" alt="" />
+
+
+
+        {{form.submit()}}
+    </form>
+
+
+
+
+{% endblock%}
+
+{%  block scripts %}
+    <script>
+
+            var filefield = document.getElementById('filefield')
+            var img = document.getElementById('mainImg')
+            filefield.onchange = evt => {
+              const [file] = filefield.files
+              if (file) {
+                img.src = URL.createObjectURL(file)
+              }
+            }
+
+            var filefield2 = document.getElementById('relativeField')
+            var img2 = document.getElementById('relativeImg')
+            filefield2.onchange = evt => {
+              const [file] = filefield2.files
+              if (file) {
+                img2.src = URL.createObjectURL(file)
+              }
+            }
+    </script>
+
+{%  endblock %}

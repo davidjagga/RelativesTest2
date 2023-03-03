@@ -9,6 +9,7 @@ from wtforms import FileField, SubmitField
 from werkzeug.utils import secure_filename
 import os
 from wtforms.validators import InputRequired
+from grayscale import grayscale
 import firebaseStorage
 
 app = Flask(__name__)
@@ -56,10 +57,12 @@ dictConfig({
     }
 })
 
+filepath = relativefilepath = ''
 
 class UploadFileForm(FlaskForm):
     file = FileField("File", validators=[InputRequired()])
-    submit = SubmitField("Upload File")
+    relativeFile = FileField("File", validators=[InputRequired()])
+    submit = SubmitField("Upload Files")
 
 
 @app.route('/')
@@ -69,32 +72,71 @@ def home():
         email = session['user']
         password = session['password']
         auth.sign_in_with_email_and_password(email, password)
-    return render_template("test.html")
+    return render_template("404.html")
 
 
-@app.route('/addToPastTests', methods=["POST", "GET"])
-def addToPastTests():
-    if 'user' in session:
-        userInfo = db.collection('users').document(session['user'])
-        userInfo.update({'pasttests': firestore.ArrayUnion([str(datetime.now())])})
-        #firebaseStorage.pushFile('static/files/mountains.png')
-        return 'Hello'
+# @app.route('/addToPastTests', methods=["POST", "GET"])
+# def addToPastTests():
+#     if 'user' in session:
+#         userInfo = db.collection('users').document(session['user'])
+#         userInfo.update({'pasttests': firestore.ArrayUnion([str(datetime.now())])})
+#         storage.child('hello.png').put('static/files/mountains.png')
+#         #firebaseStorage.pushFile('static/files/mountains.png')
+#         return 'Hello'
 
 
 
 @app.route('/takethetest', methods=["POST", "GET"])
 def test():
+    global filepath, relativefilepath
     form = UploadFileForm()
+
+
     if form.validate_on_submit():
-        file = form.file.data  # First grab the file
-        file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
-                               secure_filename(file.filename)))  # Then save the file
+        if 'user' in session:
+            # First grab the file
+            file = form.file.data
+            relativeFile = form.relativeFile.data
 
-        app.logger.info("file saved")
+            filePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
+                                   secure_filename(file.filename))
+            relativeFilePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
+                                   secure_filename(relativeFile.filename))
 
-        #os.remove(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
-                               #secure_filename(file.filename)))
+            file.save(filePath)  # Then save the file
+            relativeFile.save(relativeFilePath)
 
+            app.logger.info("files saved")
+
+            testName = str(datetime.now()).replace(" ","")
+            # link in pasttests
+            userInfo = db.collection('users').document(session['user'])
+            userInfo.update({'pasttests': firestore.ArrayUnion([testName])})
+
+            #store in Storage
+            storage.child(str(session['user'])+"-"+testName+'/main.png').put(filePath)
+            storage.child(str(session['user']) + "-" + testName + '/relative.png').put(filePath)
+
+            #store links
+            link = storage.child(str(session['user']) + "-" + testName + '/main.png').get_url(None)
+            relativeLink = storage.child(str(session['user']) + "-" + testName + '/relative.png').get_url(None)
+
+            userInfo = db.collection('links').document(str(session['user'])+"-"+testName)
+            userInfo.set({
+                "mainLink": link,
+                "relativeLink": relativeLink
+            })
+
+
+
+
+            # os.remove(filePath)
+            # os.remove(relativeFilePath)
+            #app.logger.info()
+            # render_template('displayImage.html', link=link)
+            return redirect('/getanalysis')
+        else:
+            return 'Login First'
         # try:
         #     firebaseStorage.pushFile(file.filename)
         # except:
@@ -105,50 +147,141 @@ def test():
         # os.remove('/static/files/'+file.filename)
 
 
-        return "File has been uploaded to static/files folder and to the database"
 
-    return render_template('index.html', form=form)
+
+    return render_template('upload.html', form=form)
     # return render_template("test.html")
 
+@app.route('/imageChangeing')
+def imageChanging():
+    storage.child('djjagga@gmail.com-2023-03-0211:22:05.254523.png').download('static/files/downloadedimage.png')
 
+    initial = 'static/files/downloadedimage.png'
+    destination = 'static/files/grayscale.png'
+
+    grayscale(initial, destination)
+
+    return render_template('chooseFile.html', link=url_for('static', filename='files/grayscale.png'))
 # The Team
 @app.route('/davidjagga')
 def davidjagga():
     # data = ['account']
-    return render_template("bootstrap/blank.html")
+    return render_template("404.html")
 
 
 @app.route('/siddrangavajulla')
 def siddrangavajulla():
-    return render_template("bootstrap/blank.html")
+    return render_template("404.html")
 
 
 @app.route('/dhruvaddanki')
 def dhruvaddanki():
-    return render_template("bootstrap/blank.html")
+    return render_template("404.html")
 
 
 # How does it work?
 @app.route('/goldenratio')
 def goldenratio():
-    return render_template("bootstrap/blank.html")
+    return render_template("404.html")
 
 
 @app.route('/symmetry')
 def symmetry():
-    return render_template("bootstrap/blank.html")
+    return render_template("404.html")
 
 
 @app.route('/featuredetection')
 def featuredetection():
-    return render_template("bootstrap/blank.html")
+    return render_template("404.html")
 
 
-from account import accountspage
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if 'user' in session:
+        return redirect('/')
+    if request.method == "POST":
+        app.logger.info('smth happening')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        app.logger.info(f'Email :{email}, Password: {password}')
+        try:
+            app.logger.info('1')
+            user = auth.sign_in_with_email_and_password(email, password)
+            app.logger.info('2')
+            session['user'] = email
+            session['password'] = password
+            app.logger.info('Logged In')
+            return redirect('/')
 
-app.register_blueprint(accountspage)
-# Account
+        except:
+            print("hello")
+            app.logger.info('Failed to Log In 2')
+    app.logger.info(f'Failed to Log In, {request.method}')
+    return render_template("bootstrap/login.html")
 
+
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if 'user' in session:
+        return redirect('/')
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        fname = request.form.get('firstname')
+        lname = request.form.get('lastname')
+        pass2 = request.form.get('password2')
+        try:
+            app.logger.info(email)
+            app.logger.info(password)
+            user = auth.create_user_with_email_and_password(email, password)
+            app.logger.info("Made account")
+            session['user'] = email
+            session['password'] = password
+            app.logger.info("Put account in session")
+
+            userInfo = db.collection('users').document(email)
+            userInfo.set({
+                "fname": fname,
+                "lname": lname,
+                "email": email,
+                "pasttests": []
+
+            })
+            app.logger.info("Made user info collection")
+
+            # app.logger.info('Logged In')
+            return redirect('/')
+
+        except:
+            print('hello')
+            app.logger.info('Failed to Register')
+    # app.logger.info('Failed to Log In')
+    return render_template("bootstrap/register.html")
+
+
+@app.route('/logout')
+def logout():
+    if 'user' in session:
+        session.pop('user')
+        session.pop('password')
+    return redirect('/login')
+    # return render_template("bootstrap/blank.html")
+
+
+@app.route('/resetpassword')
+def resetpassword():
+    if request.method == "POST":
+        email = request.form.get('email')
+        try:
+            auth.send_password_reset_email(email)
+        except:
+            print('hello')
+    return render_template("bootstrap/forgot-password.html")
+
+
+@app.route('/pasttests')
+def pasttests():
+    return render_template("404.html")
 
 
 

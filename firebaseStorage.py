@@ -24,4 +24,3 @@ storage = firebase_storage.storage()
 def pushFile(filename, location='l'):
     storage.child(filename).put('static/files/mountains.png')
 
-pushFile('mountains.png')
