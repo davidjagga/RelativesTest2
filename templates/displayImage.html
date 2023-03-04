@@ -7,6 +7,20 @@
 
     <h1>Here's the File you uploaded</h1>
 
-    <img src="{{ link }}" style="width: 300px; height: 150px" >
+    <p>{{ analysis }}</p>
+
+
+    <img src="{{ analysis.filepath }}" style="width: 300px; height: 150px" >
 
 {% endblock%}
+
+{% block scripts %}
+
+    <script>
+
+        var navbarElement = document.getElementById("{{active}}"+"1");
+        navbarElement.classList.remove("collapsed")
+        navbarElement.classList.add("active")
+    </script>
+
+{% endblock %}

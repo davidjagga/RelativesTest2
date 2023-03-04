@@ -36,16 +36,16 @@
                 <div class="sidebar-brand-text mx-3">The Relatives Test <sup>2</sup></div>
             </a>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link" href="/takethetest">
-                    <i class="fas fa-fw fa-pen-to-square"></i>
-                    <span>Take the Test</span></a>
-            </li>
-
+{#            <!-- Divider -->#}
+{#            <hr class="sidebar-divider my-0">#}
+{##}
+{#            <!-- Nav Item - Dashboard -->#}
+{#            <li class="nav-item">#}
+{#                <a class="nav-link" href="/takethetest">#}
+{#                    <i class="fas fa-fw fa-pen-to-square"></i>#}
+{#                    <span>Take the Test</span></a>#}
+{#            </li>#}
+{##}
             <!-- Divider -->
             <hr class="sidebar-divider">
 
@@ -55,13 +55,13 @@
             </div>
             
             <!-- Nav Item - Utilities Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+            <li id="team1" class="nav-item collapsed">
+                <a id="team2" class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#team3"
                     aria-expanded="true" aria-controls="collapseUtilities">
                     <i class="fas fa-fw fa-users"></i>
                     <span>The Team</span>
                 </a>
-                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+                <div id="team3" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         
@@ -72,13 +72,13 @@
                 </div>
             </li>
             <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+            <li id="info1" class="nav-item collapsed">
+                <a id="info2" class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#info3"
                     aria-expanded="true" aria-controls="collapseTwo">
                     <i class="fas fa-fw fa-cog"></i>
                     <span>How does it work?</span>
                 </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div id="info3" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Test Components:</h6>
                         <a class="collapse-item" href="/goldenratio">Golden Ratio</a>
@@ -99,18 +99,21 @@
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item active">
-                <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true"
+            <!-- add active or collapsed-->
+            <li id='account1' class="nav-item collapsed">
+                <!-- add or remove collapsed-->
+                <a id='account2' class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#account3" aria-expanded="true"
                     aria-controls="collapsePages">
                     <i class="fas fa-fw fa-user"></i>
                     <span>Account</span>
                 </a>
-                <div id="collapsePages" class="collapse show" aria-labelledby="headingPages"
+                <!-- add or remove show-->
+                <div id="account3" class="collapse" aria-labelledby="headingPages"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="/login">Login/Register</a>
                         <a class="collapse-item" href="/logout">Logout</a>
-                        <a class="collapse-item" href="/forgotpassword">Forgot Password</a>
+                        <a class="collapse-item" href="/resetpassword">Forgot Password</a>
                         <div class="collapse-divider"></div>
                         <h6 class="collapse-header">Saved Information</h6>
                         <a class="collapse-item" href="/pasttests">Past Tests</a>

@@ -8,3 +8,14 @@
 
 
 {% endblock%}
+
+{% block scripts %}
+
+    <script>
+
+        var navbarElement = document.getElementById("{{active}}"+"1");
+        navbarElement.classList.remove("collapsed")
+        navbarElement.classList.add("active")
+    </script>
+
+{% endblock %}

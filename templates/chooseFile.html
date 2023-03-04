@@ -10,3 +10,15 @@
     <img src="{{ link }}" style="width: 300px; height: 300px" >
 
 {% endblock%}
+
+
+{% block scripts %}
+
+    <script>
+
+        var navbarElement = document.getElementById("{{active}}"+"1");
+        navbarElement.classList.remove("collapsed")
+        navbarElement.classList.add("active")
+    </script>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'bootstrap/blank.html' %}
+
+{% block title %} Upload Test Image {% endblock%}
+
+{% block content %}
+
+
+    <h1>Here's your Past Tests</h1>
+
+    <ul>
+        {% for link in links %}
+{#            <p>{{ link.main }}</p><br>#}
+{#            <p>{{ link.relative}}</p><br>#}
+            <a href="/oldtest/{{ email }}-{{ link.test }}">Use this test</a>
+            <img src="{{ link.main }}" style="width: 300px; height: 150px"><br>
+            <img src="{{ link.relative }}" style="width: 300px; height: 150px"><br>
+
+        {% endfor %}
+    </ul>
+
+
+{% endblock%}
+
+{% block scripts %}
+
+    <script>
+
+        var navbarElement = document.getElementById("{{active}}"+"1");
+        navbarElement.classList.remove("collapsed")
+        navbarElement.classList.add("active")
+    </script>
+
+
+
+{% endblock %}
