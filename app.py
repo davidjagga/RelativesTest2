@@ -192,7 +192,7 @@ def register():
     # app.logger.info('Failed to Log In')
     return render_template("bootstrap/register.html", active='account')
 
-
+#we finished
 @app.route('/logout')
 def logout():
     if 'user' in session:
