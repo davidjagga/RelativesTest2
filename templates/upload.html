@@ -62,9 +62,11 @@
             filefield.onchange = evt => {
               const [file] = filefield.files
               if (file) {
-                img.src = URL.createObjectURL(file)
+                  img.src = URL.createObjectURL(file)
+                  filefield.className = 'btn btn-success btn-user btn-primary'
               } else {
                   img.src = "/static/img/empty_profile.png"
+                  filefield.className = 'btn btn-dark btn-user btn-primary'
               }
             }
 
@@ -73,14 +75,16 @@
             filefield2.onchange = evt => {
               const [file] = filefield2.files
               if (file) {
-                img2.src = URL.createObjectURL(file)
+                  img2.src = URL.createObjectURL(file)
+                  filefield2.className = 'btn btn-success btn-user btn-primary'
               } else {
                   img2.src = "/static/img/empty_profile.png"
+                  filefield2.className = 'btn btn-dark btn-user btn-primary'
               }
             }
             document.getElementById('submit').className = 'btn btn-primary btn-user btn-block'
-            filefield2.className = 'btn btn-user btn-primary'
-            filefield.className = 'btn btn-user btn-primary'
+            filefield2.className = 'btn btn-dark btn-user btn-primary'
+            filefield.className = 'btn btn-dark btn-user btn-primary'
     </script>
 
 

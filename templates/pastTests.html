@@ -5,22 +5,26 @@
 {% block content %}
 
 
-    <h1>Here's your Past Tests</h1>
+    <h4>Click on the title of each test box to run the Relative's test with those saved images</h4>
 
     <ul>
         {% for links2 in links %}
             <div class="row pt-5 justify-content-start">
                 {% for link in links2 %}
-                    <div class="col-4 pr-4">
-                        <div class="row justify-content-center">
-                            <a class = "btn btn-primary btn-user btn-block" href="/oldtest/{{ email }}-{{ link.test }}">Test from {{ link.test }}</a>
-                        </div>
-                        <div class="row justify-content-center">
-                            <div class = 'col'>
-                               <img class = "rounded" src="{{ link.main }}" style="width: 150px; height: 200px">
-                            </div>
-                            <div class = 'col'>
-                                <img class = "rounded" src="{{ link.relative }}" style="width: 150px; height: 200px">
+                    <div class="col-4 pr-5">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold mb-1">
+                                            <a class = "btn btn-primary btn-user btn-block" href="/oldtest/{{ email }}-{{ link.testid }}">Test from {{ link.test }}</a>
+                                        </div>
+                                        <div class = 'row justify-content-around pt-3'>
+                                            <img class = "rounded" src="{{ link.relative }}" style="width: 150px; height: 200px">
+                                            <img class = "rounded" src="{{ link.main }}" style="width: 150px; height: 200px">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
