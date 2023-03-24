@@ -8,13 +8,26 @@
     <h1>Here's your Past Tests</h1>
 
     <ul>
-        {% for link in links %}
-{#            <p>{{ link.main }}</p><br>#}
-{#            <p>{{ link.relative}}</p><br>#}
-            <a href="/oldtest/{{ email }}-{{ link.test }}">Use this test</a>
-            <img src="{{ link.main }}" style="width: 300px; height: 150px"><br>
-            <img src="{{ link.relative }}" style="width: 300px; height: 150px"><br>
+        {% for links2 in links %}
+            <div class="row pt-5 justify-content-start">
+                {% for link in links2 %}
+                    <div class="col-4 pr-4">
+                        <div class="row justify-content-center">
+                            <a class = "btn btn-primary btn-user btn-block" href="/oldtest/{{ email }}-{{ link.test }}">Test from {{ link.test }}</a>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class = 'col'>
+                               <img class = "rounded" src="{{ link.main }}" style="width: 150px; height: 200px">
+                            </div>
+                            <div class = 'col'>
+                                <img class = "rounded" src="{{ link.relative }}" style="width: 150px; height: 200px">
+                            </div>
+                        </div>
+                    </div>
 
+
+                {% endfor %}
+            </div>
         {% endfor %}
     </ul>
 

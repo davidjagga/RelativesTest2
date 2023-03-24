@@ -5,26 +5,48 @@
 {% block content %}
 
 
-
-
     <form method='POST' enctype='multipart/form-data'>
-        <h1>Upload A Photo of Yourself</h1>
         {{form.hidden_tag()}}
-        {{form.file(**{"id":"filefield"})}}
-        <div></div>
-        <h1>Upload A Photo of a Relative</h1>
-        {{ form.relativeFile(**{"id":"relativeField"})}}
 
-        <div>
-			<img style="height:100px;width:100px;display:none" id="your-image"/>
-		</div>
+        <div class="row p-3 justify-content-around">
+            <div class = "col-6 text-center">
 
-        <img id="mainImg" src="#" alt="" />
-        <img id="relativeImg" src="#" alt="" />
+                <h3>Upload A Photo of Yourself</h3>
+
+                <div class="pb-3">
+                    {{form.file(**{"id":"filefield"})}}
+                </div>
 
 
+                <div class="w-100"></div>
 
-        {{form.submit()}}
+                <img id="mainImg" class = 'rounded' src="/static/img/empty_profile.png" style="width: 300px; height: 400px"/>
+
+            </div>
+
+            <div class = "col-6 text-center">
+                <h3>Upload A Photo of a Relative</h3>
+
+                <div class="pb-3">
+                    {{form.relativeFile(**{"id":"relativeField"})}}
+                </div>
+
+                <div class="w-100"></div>
+
+                <img id="relativeImg" class = 'rounded' src="/static/img/empty_profile.png" style="width: 300px; height: 400px"/>
+            </div>
+
+            <div class="w-100 p-3"></div>
+        </div>
+
+        <div class="row justify-content-center pt-5">
+
+            <div class="col">
+                {{form.submit()}}
+            </div>
+        </div>
+
+
     </form>
 
 
@@ -41,6 +63,8 @@
               const [file] = filefield.files
               if (file) {
                 img.src = URL.createObjectURL(file)
+              } else {
+                  img.src = "/static/img/empty_profile.png"
               }
             }
 
@@ -50,9 +74,16 @@
               const [file] = filefield2.files
               if (file) {
                 img2.src = URL.createObjectURL(file)
+              } else {
+                  img2.src = "/static/img/empty_profile.png"
               }
             }
+            document.getElementById('submit').className = 'btn btn-primary btn-user btn-block'
+            filefield2.className = 'btn btn-user btn-primary'
+            filefield.className = 'btn btn-user btn-primary'
     </script>
+
+
 
 
     <script>

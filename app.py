@@ -7,7 +7,7 @@ from firebase_admin import db, credentials, firestore
 from datetime import datetime
 from wtforms import FileField, SubmitField
 from werkzeug.utils import secure_filename
-import os
+import os, shutil
 from wtforms.validators import InputRequired
 from grayscale import grayscale
 from imageanalysistest import grayscale2
@@ -65,8 +65,6 @@ class UploadFileForm(FlaskForm):
     relativeFile = FileField("File", validators=[InputRequired()])
     submit = SubmitField("Upload Files")
 
-
-
 @app.route('/', methods=["POST", "GET"])
 def test():
     global filePath, relativeFilePath
@@ -77,23 +75,29 @@ def test():
         email = session['user']
         password = session['password']
         auth.sign_in_with_email_and_password(email, password)
+        app.logger.info('mainpage')
         if form.validate_on_submit():
+            app.logger.info("started")
+            if os.path.exists((path := os.path.join(app.config['UPLOAD_FOLDER'], "main.png"))):
+                os.remove(path)
+            if os.path.exists((path := os.path.join(app.config['UPLOAD_FOLDER'], "relative.png"))):
+                os.remove(path)
 
             # First grab the file
             file = form.file.data
             relativeFile = form.relativeFile.data
 
             filePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
-                                   secure_filename("main"+file.filename))
+                                   secure_filename("main.png"))
             relativeFilePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
-                                   secure_filename("relative"+relativeFile.filename))
+                                   secure_filename("relative.png"))
 
             file.save(filePath)  # Then save the file
             relativeFile.save(relativeFilePath)
 
             app.logger.info("files saved")
 
-            testName = str(datetime.now()).replace(" ","")
+            testName = str(datetime.now()).replace(" ","-")
             # link in pasttests
             userInfo = db.collection('users').document(session['user'])
             userInfo.update({'pasttests': firestore.ArrayUnion([testName])})
@@ -120,7 +124,7 @@ def test():
             return render_template('upload.html', form=form)
     else:
         return render_template('404.html', error="Login first!", active='test')
-    # return render_template("test.html")
+
 @app.route('/getanalysis')
 def analysis():
     if not (filePath or relativeFilePath): return redirect('/')
@@ -210,18 +214,23 @@ def resetpassword():
             print('hello')
     return render_template("bootstrap/forgot-password.html", active='account')
 
-
 @app.route('/pasttests')
 def pasttests():
+    if os.path.exists((path:=os.path.join(app.config['UPLOAD_FOLDER'], "main.png"))):
+        os.remove(path)
+    if os.path.exists((path := os.path.join(app.config['UPLOAD_FOLDER'], "relative.png"))):
+        os.remove(path)
+
+
     if 'user' not in session: return render_template("404.html", error="You haven't logged in just yet", active='account')
     email = str(session['user'])
 
     userInfo = db.collection('users').document(email).get().to_dict()
-
-    testList = userInfo['pasttests']
+    if not userInfo['pasttests']: return render_template('404.html', error="You don't have any past tests yet!", active='account')
+    testList = userInfo['pasttests'][::-1]
     if not testList: return render_template('404.html', error="You don't have any past tests yet!", active='account')
 
-    testList = testList[:10]
+    testList = testList[:30]
 
     links = db.collection('links')
 
@@ -235,8 +244,10 @@ def pasttests():
         linkList.append({
             'main': mainLink,
             'relative': relativeLink,
-            'test': test
+            'test': idToDate(test)
         })
+    linkList = [linkList[i:i+3] for i in range(0, len(linkList), 3)]
+
     app.logger.info(linkList)
 
 
@@ -295,6 +306,26 @@ def symmetry():
 def featuredetection():
     return render_template("404.html", error="We're still making this page.", active='info')
 
+@app.route('/testarea')
+def testhtml():
+    return render_template("test.html")
 
 
+
+def idToDate(id):
+    dateDict = {
+        "01": "January",
+        "02": "February",
+        "03": "March",
+        "04": "April",
+        "05": "May",
+        "06": "June",
+        "07": "July",
+        "08": "August",
+        "09": "September",
+        "10": "October",
+        "11": "November",
+        "12": "December"
+    }
+    return dateDict[id[5:7]]+" "+id[8:10]+", "+id[0:4]
 
