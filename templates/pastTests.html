@@ -1,12 +1,12 @@
 {% extends 'bootstrap/blank.html' %}
 
-{% block title %} Upload Test Image {% endblock%}
+{% block title %} Past Tests {% endblock%}
 
 {% block content %}
 
-
-    <h4>Click on the title of each test box to run the Relative's test with those saved images</h4>
-
+    <p id="message" class="text-secondary">
+    {{ message }}
+    </p>
     <ul>
         {% for links2 in links %}
             <div class="row pt-5 justify-content-start">
@@ -33,6 +33,11 @@
                 {% endfor %}
             </div>
         {% endfor %}
+        <div class="row pt-5 justify-content-center">
+            <div class="col-8">
+                <a id='link' class="btn btn-primary btn-user btn-block" href="/clearOldTests"> Clear Your Tests</a>
+            </div>
+        </div>
     </ul>
 
 
@@ -45,6 +50,19 @@
         var navbarElement = document.getElementById("{{active}}"+"1");
         navbarElement.classList.remove("collapsed")
         navbarElement.classList.add("active")
+
+
+    </script>
+
+    <script>
+        var link = document.getElementById('link')
+        var msg = document.getElementById('message')
+        if (msg.innerHTML.includes("It")) {
+            link.href = "/"
+            link.innerHTML = "Take a Relative Test"
+        }
+
+
     </script>
 
 

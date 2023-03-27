@@ -1,16 +1,26 @@
 {% extends "bootstrap/blank.html" %}
 
-{% block title %} Upload Test Image {% endblock%}
+{% block title %} The Relative Results {% endblock%}
 
 {% block content %}
 
 
-    <h1>Here's the File you uploaded</h1>
+    <h4 class="text-primary" >Here's your Results!</h4>
 
-    <p>{{ analysis }}</p>
+    <div class = "row pb-3">
+        <div class="col">
+            <p class="">{{ analysis }}</p>
+        </div>
+        <div class="col text-center">
+            <img class="rounded" src="{{ analysis.filepath }}" style="width: 450px; height: 600px" >
+        </div>
+
+    </div>
 
 
-    <img src="{{ analysis.filepath }}" style="width: 300px; height: 150px" >
+
+
+
 
 {% endblock%}
 

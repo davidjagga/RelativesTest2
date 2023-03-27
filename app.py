@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 import pyrebase
 import firebase_admin
 from firebase_admin import db, credentials, firestore
+from firebase_admin import storage as admin_storage
 from datetime import datetime
 from wtforms import FileField, SubmitField
 from werkzeug.utils import secure_filename
@@ -30,7 +31,7 @@ firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
 
 cred = credentials.Certificate("key.json")
-firebase_admin.initialize_app(cred)
+firebase_admin.initialize_app(cred, {'storageBucket': 'relatives-test.appspot.com'})
 
 db = firestore.client()
 storage = firebase.storage()
@@ -112,6 +113,7 @@ def test():
 
             userInfo = db.collection('links').document(str(session['user'])+"-"+testName)
             userInfo.set({
+                "email": str(session['user']),
                 "mainLink": link,
                 "relativeLink": relativeLink
             })
@@ -224,11 +226,13 @@ def pasttests():
 
     if 'user' not in session: return render_template("404.html", error="You haven't logged in just yet", active='account')
     email = str(session['user'])
-
+    message = "It seems like you don't have any Relative Tests saved. As soon as you take a test, it will be saved here!"
+    message2 = "Click on the title of each test box to run the Relative's test with those saved images"
     userInfo = db.collection('users').document(email).get().to_dict()
-    if not userInfo['pasttests']: return render_template('404.html', error="You don't have any past tests yet!", active='account')
+    if 'pasttests' not in userInfo or not userInfo['pasttests']:
+        return render_template('pastTests.html', links=[[]], email=email, active='account', message=message)
     testList = userInfo['pasttests'][::-1]
-    if not testList: return render_template('404.html', error="You don't have any past tests yet!", active='account')
+
 
     testList = testList[:30]
 
@@ -244,14 +248,16 @@ def pasttests():
         linkList.append({
             'main': mainLink,
             'relative': relativeLink,
+            'testid': test,
             'test': idToDate(test)
+
         })
     linkList = [linkList[i:i+3] for i in range(0, len(linkList), 3)]
 
     app.logger.info(linkList)
 
 
-    return render_template('pastTests.html', links=linkList, email=email, active='account')
+    return render_template('pastTests.html', links=linkList, email=email, active='account', message=message2)
 
 @app.route('/oldtest/<testid>')
 def oldtest(testid):
@@ -264,7 +270,7 @@ def oldtest(testid):
                                     secure_filename("relative.png"))
 
     try:
-        storage.child("img/"+testid+"/main.png").download(filePath)
+        storage.child("img/" + testid + "/main.png").download(filePath)
         storage.child("img/" + testid + "/relative.png").download(relativeFilePath)
     except:
         return render_template('404.html', error='File Not Found', active="")
@@ -310,6 +316,33 @@ def featuredetection():
 def testhtml():
     return render_template("test.html")
 
+@app.route('/clearOldTests')
+def clearold():
+    if 'user' not in session: return render_template("404.html", error="You need to be logged in.", active='account')
+    email = session['user']
+
+
+    userInfo = db.collection('users').document(email)
+    infodict = userInfo.get().to_dict()
+    if 'pasttests' not in infodict or not infodict['pasttests']: return redirect('/pasttests')
+    pts = infodict['pasttests']
+
+    userInfo.update({'pasttests': []})
+
+    links = db.collection('links')
+
+    for pt in pts:
+        testid = email + '-' + pt
+        links.document(testid).delete()
+        bucket = admin_storage.bucket()
+        blob = bucket.blob(f'img/{testid}/relative.png')
+        blob.delete()
+        bucket = admin_storage.bucket()
+        blob = bucket.blob(f'img/{testid}/main.png')
+        blob.delete()
+
+
+    return redirect('/pasttests')
 
 
 def idToDate(id):

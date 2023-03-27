@@ -1,6 +1,6 @@
 {% extends "bootstrap/blank.html" %}
 
-{% block title %} Upload Test Image {% endblock%}
+{% block title %} Upload Your Images {% endblock%}
 
 {% block content %}
 
@@ -11,7 +11,7 @@
         <div class="row p-3 justify-content-around">
             <div class = "col-6 text-center">
 
-                <h3>Upload A Photo of Yourself</h3>
+                <h3>Choose A Photo of Yourself</h3>
 
                 <div class="pb-3">
                     {{form.file(**{"id":"filefield"})}}
@@ -25,7 +25,7 @@
             </div>
 
             <div class = "col-6 text-center">
-                <h3>Upload A Photo of a Relative</h3>
+                <h3>Choose A Photo of a Relative</h3>
 
                 <div class="pb-3">
                     {{form.relativeFile(**{"id":"relativeField"})}}
