@@ -14,7 +14,7 @@ from grayscale import grayscale
 from imageanalysistest import grayscale2
 import firebaseStorage
 
-app = Flask(__name__)
+application = Flask(__name__)
 
 config = {
     "apiKey": "AIzaSyDCe_5uQYZrSH87RQ9kp9pfJgG8PA8IHsk",
@@ -36,10 +36,10 @@ firebase_admin.initialize_app(cred, {'storageBucket': 'relatives-test.appspot.co
 db = firestore.client()
 storage = firebase.storage()
 
-app.secret_key = 'e6rduyitfvdasjkb'
+application.secret_key = 'e6rduyitfvdasjkb'
 
 # Upload folder
-app.config['UPLOAD_FOLDER'] = 'static/files'
+application.config['UPLOAD_FOLDER'] = 'static/files'
 
 from logging.config import dictConfig
 
@@ -66,7 +66,7 @@ class UploadFileForm(FlaskForm):
     relativeFile = FileField("File", validators=[InputRequired()])
     submit = SubmitField("Upload Files")
 
-@app.route('/', methods=["POST", "GET"])
+@application.route('/', methods=["POST", "GET"])
 def test():
     global filePath, relativeFilePath
     form = UploadFileForm()
@@ -76,27 +76,27 @@ def test():
         email = session['user']
         password = session['password']
         auth.sign_in_with_email_and_password(email, password)
-        app.logger.info('mainpage')
+        application.logger.info('mainpage')
         if form.validate_on_submit():
-            app.logger.info("started")
-            if os.path.exists((path := os.path.join(app.config['UPLOAD_FOLDER'], "main.png"))):
+            application.logger.info("started")
+            if os.path.exists((path := os.path.join(application.config['UPLOAD_FOLDER'], "main.png"))):
                 os.remove(path)
-            if os.path.exists((path := os.path.join(app.config['UPLOAD_FOLDER'], "relative.png"))):
+            if os.path.exists((path := os.path.join(application.config['UPLOAD_FOLDER'], "relative.png"))):
                 os.remove(path)
 
             # First grab the file
             file = form.file.data
             relativeFile = form.relativeFile.data
 
-            filePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
-                                   secure_filename("main.png"))
-            relativeFilePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
-                                   secure_filename("relative.png"))
+            filePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), application.config['UPLOAD_FOLDER'],
+                                    secure_filename("main.png"))
+            relativeFilePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), application.config['UPLOAD_FOLDER'],
+                                            secure_filename("relative.png"))
 
             file.save(filePath)  # Then save the file
             relativeFile.save(relativeFilePath)
 
-            app.logger.info("files saved")
+            application.logger.info("files saved")
 
             testName = str(datetime.now()).replace(" ","-")
             # link in pasttests
@@ -105,7 +105,7 @@ def test():
 
             #store in Storage
             storage.child("img/"+str(session['user'])+"-"+testName+'/main.png').put(filePath)
-            storage.child("img/"+str(session['user']) + "-" + testName + '/relative.png').put(filePath)
+            storage.child("img/"+str(session['user']) + "-" + testName + '/relative.png').put(relativeFilePath)
 
             #store links
             link = storage.child("img/"+str(session['user']) + "-" + testName + '/main.png').get_url(None)
@@ -127,7 +127,7 @@ def test():
     else:
         return render_template('404.html', error="Login first!", active='test')
 
-@app.route('/getanalysis')
+@application.route('/getanalysis')
 def analysis():
     if not (filePath or relativeFilePath): return redirect('/')
     analysis = grayscale2(filePath, relativeFilePath)
@@ -136,31 +136,31 @@ def analysis():
 
     return render_template('displayImage.html', analysis=analysis)
 
-@app.route('/login', methods=['POST', 'GET'])
+@application.route('/login', methods=['POST', 'GET'])
 def login():
     if 'user' in session:
         return redirect('/')
     if request.method == "POST":
-        app.logger.info('smth happening')
+        application.logger.info('smth happening')
         email = request.form.get('email')
         password = request.form.get('password')
-        app.logger.info(f'Email :{email}, Password: {password}')
+        application.logger.info(f'Email :{email}, Password: {password}')
         try:
-            app.logger.info('1')
+            application.logger.info('1')
             user = auth.sign_in_with_email_and_password(email, password)
-            app.logger.info('2')
+            application.logger.info('2')
             session['user'] = email
             session['password'] = password
-            app.logger.info('Logged In')
+            application.logger.info('Logged In')
             return redirect('/')
 
         except:
             print("hello")
-            app.logger.info('Failed to Log In 2')
-    app.logger.info(f'Failed to Log In, {request.method}')
+            application.logger.info('Failed to Log In 2')
+    application.logger.info(f'Failed to Log In, {request.method}')
     return render_template("bootstrap/login.html", active='account')
 
-@app.route('/register', methods=['POST', 'GET'])
+@application.route('/register', methods=['POST', 'GET'])
 def register():
     if 'user' in session:
         return redirect('/')
@@ -171,13 +171,13 @@ def register():
         lname = request.form.get('lastname')
         pass2 = request.form.get('password2')
         try:
-            app.logger.info(email)
-            app.logger.info(password)
+            application.logger.info(email)
+            application.logger.info(password)
             user = auth.create_user_with_email_and_password(email, password)
-            app.logger.info("Made account")
+            application.logger.info("Made account")
             session['user'] = email
             session['password'] = password
-            app.logger.info("Put account in session")
+            application.logger.info("Put account in session")
 
             userInfo = db.collection('users').document(email)
             userInfo.set({
@@ -187,26 +187,26 @@ def register():
                 "pasttests": []
 
             })
-            app.logger.info("Made user info collection")
+            application.logger.info("Made user info collection")
 
             # app.logger.info('Logged In')
             return redirect('/')
 
         except:
             print('hello')
-            app.logger.info('Failed to Register')
+            application.logger.info('Failed to Register')
     # app.logger.info('Failed to Log In')
     return render_template("bootstrap/register.html", active='account')
 
 #we finished
-@app.route('/logout')
+@application.route('/logout')
 def logout():
     if 'user' in session:
         session.pop('user')
         session.pop('password')
     return render_template('bootstrap/logout.html')
 
-@app.route('/resetpassword')
+@application.route('/resetpassword')
 def resetpassword():
     if request.method == "POST":
         email = request.form.get('email')
@@ -216,11 +216,11 @@ def resetpassword():
             print('hello')
     return render_template("bootstrap/forgot-password.html", active='account')
 
-@app.route('/pasttests')
+@application.route('/pasttests')
 def pasttests():
-    if os.path.exists((path:=os.path.join(app.config['UPLOAD_FOLDER'], "main.png"))):
+    if os.path.exists((path:=os.path.join(application.config['UPLOAD_FOLDER'], "main.png"))):
         os.remove(path)
-    if os.path.exists((path := os.path.join(app.config['UPLOAD_FOLDER'], "relative.png"))):
+    if os.path.exists((path := os.path.join(application.config['UPLOAD_FOLDER'], "relative.png"))):
         os.remove(path)
 
 
@@ -254,19 +254,19 @@ def pasttests():
         })
     linkList = [linkList[i:i+3] for i in range(0, len(linkList), 3)]
 
-    app.logger.info(linkList)
+    application.logger.info(linkList)
 
 
     return render_template('pastTests.html', links=linkList, email=email, active='account', message=message2)
 
-@app.route('/oldtest/<testid>')
+@application.route('/oldtest/<testid>')
 def oldtest(testid):
     global filePath, relativeFilePath
     if 'user' not in session: return render_template('404.html', error="Login first!", active='test')
 
-    filePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
+    filePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), application.config['UPLOAD_FOLDER'],
                             secure_filename("main.png"))
-    relativeFilePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],
+    relativeFilePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), application.config['UPLOAD_FOLDER'],
                                     secure_filename("relative.png"))
 
     try:
@@ -281,42 +281,42 @@ def oldtest(testid):
 
 #Information Pages
 
-@app.route('/davidjagga')
+@application.route('/davidjagga')
 def davidjagga():
     # data = ['account']
     return render_template("404.html", error="We're still making this page.", active='team')
 
 
-@app.route('/siddrangavajulla')
+@application.route('/siddrangavajulla')
 def siddrangavajulla():
     return render_template("404.html", error="We're still making this page.", active='team')
 
 
-@app.route('/dhruvaddanki')
+@application.route('/dhruvaddanki')
 def dhruvaddanki():
     return render_template("404.html", error="We're still making this page.", active='team')
 
 
 # How does it work?
-@app.route('/goldenratio')
+@application.route('/goldenratio')
 def goldenratio():
     return render_template("404.html", error="We're still making this page.", active='info')
 
 
-@app.route('/symmetry')
+@application.route('/symmetry')
 def symmetry():
     return render_template("404.html", error="We're still making this page.", active='info')
 
 
-@app.route('/featuredetection')
+@application.route('/featuredetection')
 def featuredetection():
     return render_template("404.html", error="We're still making this page.", active='info')
 
-@app.route('/testarea')
+@application.route('/testarea')
 def testhtml():
     return render_template("test.html")
 
-@app.route('/clearOldTests')
+@application.route('/clearOldTests')
 def clearold():
     if 'user' not in session: return render_template("404.html", error="You need to be logged in.", active='account')
     email = session['user']
