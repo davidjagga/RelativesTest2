@@ -361,4 +361,3 @@ def idToDate(id):
         "12": "December"
     }
     return dateDict[id[5:7]]+" "+id[8:10]+", "+id[0:4]
-
