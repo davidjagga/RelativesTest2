@@ -1,34 +1,55 @@
 {% extends "bootstrap/blank.html" %}
 
-{% block title %} The Relative Results {% endblock%}
+{% block title %} The Relative Results {% endblock %}
 
 {% block content %}
 
+    <div class="row p-3">
+        <div class="col p-3">
+            <div class="row">
 
-    <h4 class="text-primary" >Here's your Results!</h4>
+                <h2 class="text-primary">Your Similarity Score was {{ analysis.score }}</h2>
+                <p class=""> You were most similar to this person since your <b>{{ analysis.min1 }}</b> and
+                    <b>{{ analysis.min2 }}</b> were similar.</p>
+                <p class=""> Your <b>{{ analysis.max }}</b> were your biggest difference.</p>
+            </div>
+            <div class = "row">
 
-    <div class = "row pb-3">
-        <div class="col">
-            <p class="">{{ analysis }}</p>
+                <h6 class="text-dark"><b>Feature Differences:</b></h6>
+            </div>
+            <div class = "row pb-5">
+                <div class="col-5 justify-content-center">
+                    <p>Main File Facial Features:</p>
+                    <img class="rounded" src="/static/files/meye.png" style="width: 80px; height: 80px">
+                    <img class="rounded" src="/static/files/mskin.png" style="width: 80px; height: 80px">
+                    <p> Eye Color: <b>{{ analysis.eye1 }}</b> </br> Skin Color: <b>{{ analysis.skin1 }}</b></p>
+                </div>
+                <div class="col-5 justify-content-center">
+                    <p>Relative File Facial Features:</p>
+                    <img class="rounded" src="/static/files/reye.png" style="width: 80px; height: 80px">
+                    <img class="rounded" src="/static/files/rskin.png" style="width: 80px; height: 80px">
+                    <p> Eye Color: <b>{{ analysis.eye2 }}</b> </br> Skin Color: <b>{{ analysis.skin2 }}</b></p>
+                </div>
+            </div>
+            <div class = "row justify-content-start">
+                <p>Eye Color Disparity: <b>{{ analysis.eyeDist }}</b></p>
+            </div>
+            <div class = "row justify-content-start">
+                <p>Skin Color Disparity: <b>{{ analysis.skinDist }}</b></p>
+            </div>
         </div>
         <div class="col text-center">
-            <img class="rounded" src="{{ analysis.filepath }}" style="width: 450px; height: 600px" >
+            <img class="rounded" src="{{ analysis.filepath }}" style="width: 450px; height: 600px">
         </div>
 
     </div>
-
-
-
-
-
-
-{% endblock%}
+{% endblock %}
 
 {% block scripts %}
 
     <script>
 
-        var navbarElement = document.getElementById("{{active}}"+"1");
+        var navbarElement = document.getElementById("{{active}}" + "1");
         navbarElement.classList.remove("collapsed")
         navbarElement.classList.add("active")
     </script>

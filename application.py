@@ -11,8 +11,9 @@ from werkzeug.utils import secure_filename
 import os, shutil
 from wtforms.validators import InputRequired
 from grayscale import grayscale
-from imageanalysistest import grayscale2
+from imageanalysistest import analyze_image
 import firebaseStorage
+import webbrowser
 
 application = Flask(__name__)
 
@@ -125,14 +126,14 @@ def test():
         else:
             return render_template('upload.html', form=form)
     else:
-        return render_template('404.html', error="Login first!", active='test')
-
+        return redirect('/login')
 @application.route('/getanalysis')
 def analysis():
     if not (filePath or relativeFilePath): return redirect('/')
-    analysis = grayscale2(filePath, relativeFilePath)
+    analysis = analyze_image(filePath, relativeFilePath)
     analysis['filepath'] = analysis['filepath'][analysis['filepath'].index('/static'):]
     analysis['relativefilepath'] = analysis['relativefilepath'][analysis['relativefilepath'].index('/static'):]
+
 
     return render_template('displayImage.html', analysis=analysis)
 
@@ -159,7 +160,6 @@ def login():
             application.logger.info('Failed to Log In 2')
     application.logger.info(f'Failed to Log In, {request.method}')
     return render_template("bootstrap/login.html", active='account')
-
 @application.route('/register', methods=['POST', 'GET'])
 def register():
     if 'user' in session:
@@ -268,12 +268,11 @@ def oldtest(testid):
                             secure_filename("main.png"))
     relativeFilePath = os.path.join(os.path.abspath(os.path.dirname(__file__)), application.config['UPLOAD_FOLDER'],
                                     secure_filename("relative.png"))
-
     try:
-        storage.child("img/" + testid + "/main.png").download(filePath)
-        storage.child("img/" + testid + "/relative.png").download(relativeFilePath)
+        storage.child("img/" + testid + "/main.png").download("gs://relatives-test.appspot.com/", filePath)
+        storage.child("img/" + testid + "/relative.png").download("gs://relatives-test.appspot.com/", relativeFilePath)
     except:
-        return render_template('404.html', error='File Not Found', active="")
+        return render_template('404.html', error=f'File Not Found at {filePath}', active="")
 
 
     return redirect('/getanalysis')
@@ -284,33 +283,39 @@ def oldtest(testid):
 @application.route('/davidjagga')
 def davidjagga():
     # data = ['account']
-    return render_template("404.html", error="We're still making this page.", active='team')
+    webbrowser.open_new_tab('https://www.linkedin.com/in/david-jagga-08a8a0246/')
+    return redirect('/')
 
 
 @application.route('/siddrangavajulla')
 def siddrangavajulla():
-    return render_template("404.html", error="We're still making this page.", active='team')
+    webbrowser.open_new_tab('https://www.linkedin.com/in/siddrangavajjula')
+    return redirect('/')
 
 
 @application.route('/dhruvaddanki')
 def dhruvaddanki():
-    return render_template("404.html", error="We're still making this page.", active='team')
+    webbrowser.open_new_tab('https://www.linkedin.com/in/dhruv-addanki-344462237/')
+    return redirect('/')
 
 
 # How does it work?
 @application.route('/goldenratio')
 def goldenratio():
-    return render_template("404.html", error="We're still making this page.", active='info')
+    webbrowser.open_new_tab('https://www.scss.tcd.ie/Rachel.McDonnell/papers/ApplicationOfGR.pdf')
+    return redirect('/')
 
 
 @application.route('/symmetry')
 def symmetry():
-    return render_template("404.html", error="We're still making this page.", active='info')
+    webbrowser.open_new_tab('https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1690211/')
+    return redirect('/')
 
 
 @application.route('/featuredetection')
 def featuredetection():
-    return render_template("404.html", error="We're still making this page.", active='info')
+    webbrowser.open_new_tab('https://developers.google.com/mediapipe/solutions/examples')
+    return redirect('/')
 
 @application.route('/testarea')
 def testhtml():
@@ -361,3 +366,6 @@ def idToDate(id):
         "12": "December"
     }
     return dateDict[id[5:7]]+" "+id[8:10]+", "+id[0:4]
+
+if __name__ == '__main__':
+    application.run()
